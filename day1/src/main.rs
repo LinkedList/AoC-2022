@@ -1,25 +1,37 @@
-use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::env;
+use sorted_vec::ReverseSortedVec;
+use std::cmp::Reverse;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let path = &args[1];
 
-    let fileStr = fs::read_to_string(path).expect("Should have been able to read the file");;
+    let mut sums: ReverseSortedVec<u32> = ReverseSortedVec::<u32>::new();
+    let mut local_sum: u32 = 0;
 
-    let mut split = fileStr.split("\n\n");
-    let mut total: Vec<u32> = Vec::new();
-
-    for s in split {
-        let lines: Vec<u32> = s.lines().into_iter().map(|s| s.parse::<u32>().expect("This is not a integer")).collect();
-        let sum: u32 = lines.iter().sum();
-        total.push(sum)
+    if let Ok(lines) = read_lines(path) {
+        for line in lines {
+            if let Ok(line) = line {
+                if line.is_empty() {
+                    sums.insert(Reverse(local_sum.clone()));
+                    local_sum = 0;
+                } else {
+                    local_sum = local_sum + line.parse::<u32>().expect("Not an integer");
+                }
+            }
+        }
     }
-    total.sort();
-    let result: u32 = total.iter().rev().take(3).sum();
 
-    println!("{:?}", result);
+    println!("{:?}", sums.iter().take(3).map(|r| r.0).sum::<u32>());
 }
+
+// The output is wrapped in a Result to allow matching on errors
+// Returns an Iterator to the Reader of the lines of the file.
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
+}
+

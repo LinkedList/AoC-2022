@@ -5,3 +5,12 @@ version = 3
 [[package]]
 name = "day1"
 version = "0.1.0"
+dependencies = [
+ "sorted-vec",
+]
+
+[[package]]
+name = "sorted-vec"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2eb853cc81eaf9f519b949deb6a1e2f1512c14006c2a2f6bd41b55fb0b37030a"
