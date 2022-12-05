@@ -22,7 +22,7 @@ fn main() {
         let range1 = RangeInclusive::new(first[0], first[1]);
         let range2 = RangeInclusive::new(second[0], second[1]);
 
-        if contains_all(&range1, &range2) || contains_all(&range2, &range1) {
+        if contains_any(&range1, &range2) || contains_any(&range2, &range1) {
             score = score + 1;
         }
     }
@@ -40,6 +40,16 @@ fn contains_all(range1: &RangeInclusive<i32>, range2: &RangeInclusive<i32>) -> b
     return contains;
 }
 
+fn contains_any(range1: &RangeInclusive<i32>, range2: &RangeInclusive<i32>) -> bool {
+    let mut contains = false;
+    for num in range2.clone() {
+        if range1.contains(&num) {
+            contains = true;
+            break;
+        }
+    }
+    return contains;
+}
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
     let file = File::open(filename)?;
