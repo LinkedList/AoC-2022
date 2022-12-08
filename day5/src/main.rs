@@ -3,6 +3,7 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use std::env;
 use std::collections::HashMap;
+use std::collections::VecDeque;
 
 #[derive(Debug)]
 struct Move {
@@ -27,13 +28,20 @@ fn main() {
         println!("{:?}", m);
         println!();
 
+        let mut temp = VecDeque::<char>::new();
+
         for _ in 0..(m.times) {
             let from = stacks.get_mut(&m.from).unwrap();
             let object = from.pop().unwrap();
+            temp.push_front(object);
+        }
 
+        for _ in 0..(m.times) {
             let to = stacks.get_mut(&m.to).unwrap();
+            let object = temp.pop_front().unwrap();
             to.push(object);
         }
+
 
         print_stacks(&stacks);
         println!();
