@@ -4,16 +4,62 @@ use std::path::Path;
 use std::env;
 use std::collections::HashMap;
 
+#[derive(Debug)]
+struct Move {
+    times: usize,
+    from: usize,
+    to: usize
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let path_crates = &args[1];
     let path_moves = &args[2];
 
     let crates = parse_input(path_crates);
-    let moves = parse_input(path_moves);
-
+    let moves_vec = parse_input(path_moves);
     let mut stacks = build_stacks(crates);
-    println!("{:?}", stacks);
+
+    print_stacks(&stacks);
+
+    for move_str in moves_vec {
+        let m = parse_move(move_str);
+        println!("{:?}", m);
+        println!();
+
+        for _ in 0..(m.times) {
+            let from = stacks.get_mut(&m.from).unwrap();
+            let object = from.pop().unwrap();
+
+            let to = stacks.get_mut(&m.to).unwrap();
+            to.push(object);
+        }
+
+        print_stacks(&stacks);
+        println!();
+    }
+    print_stacks(&stacks);
+}
+
+fn print_stacks(stacks: &HashMap<usize, Vec<char>>) {
+    for i in 1..=9 {
+        println!("{:?}", stacks.get(&i));
+    }
+}
+
+
+fn parse_move(str: String) -> Move {
+    let moves = str.split(',').collect::<Vec<&str>>();
+
+    Move {
+        times: to_int(moves[0]),
+        from: to_int(moves[1]),
+        to: to_int(moves[2])
+    }
+}
+
+fn to_int(string: &str) -> usize {
+    string.parse::<usize>().unwrap()
 }
 
 fn build_stacks(crates: Vec<String>) -> HashMap<usize, Vec<char>> {
